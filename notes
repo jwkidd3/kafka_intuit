@@ -1,0 +1,2 @@
+kafka-producer-perf-test.sh --topic test --num-records 50 --throughput 10 --producer-props bootstrap.servers=localhost:9092 key.serializer=org.apache.kafka.common.serialization.StringSerializer value.serializer=org.apache.kafka.common.serialization.StringSerializer --record-size 1
+https://github.com/dpkp/kafka-python

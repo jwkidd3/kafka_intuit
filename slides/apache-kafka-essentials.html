@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Apache Kafka™ Workshop | The Essentials of Apache Kafka™</title>
+
+    <meta name="description" content="Apache Kafka™ Workshop | The Essentials of Apache Kafka™">
+
+    <link rel="stylesheet" href="reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="reveal.js/css/theme/beige.css" id="theme">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="reveal.js/lib/css/zenburn.css">
+
+    <!-- Jacek: custom formatting -->
+    <link rel="stylesheet" href="revealjs-css/jacek.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+
+  <body>
+    <div class="reveal">
+
+      <div class="slides">
+
+        <section class="intro" data-transition="zoom" id="home">
+          <h1 style="font-size: 3.44em;">The Essentials of<br>Apache Kafka™</h1>
+          <h3>Apache Kafka™ 2.3.0</h3>
+        </section>
+
+        <section id="agenda" data-markdown>
+          <textarea data-template>
+            ## Agenda
+
+            1. [Introduction](#/intro)
+            1. [Core Concepts of Apache Kafka™](#/concepts)
+            1. [Features of Kafka](#/kafka-features)
+            1. [Kafka Streams](#/kafka-streams)
+            1. [Kafka Connect](#/kafka-connect)
+            1. [Confluent KSQL](#/confluent-ksql)
+          </textarea>
+        </section>
+
+        <section>
+          <section id="intro" data-markdown>
+            <textarea data-template>
+              ## Introduction <small>(1 of 2)</small>
+
+              **Apache Kafka** is an open source **publish-subscribe messaging system** based on the concept of a **distributed commit log**.
+
+              **Messages** (aka **records**) in Kafka are distributed, stored durably and in order, and can be read deterministically.
+            </textarea>
+          </section>
+          <section data-markdown>
+            <textarea data-template>
+              ## Introduction <small>(2 of 2)</small>
+
+              **Apache Kafka** is an open source "umbrella" project with the following modules:
+
+              * Kafka Core
+                * Broker
+                * Producer and Consumer APIs
+              * Kafka Streams
+              * Kafka Connect
+
+              _From a messaging queue to a distributed streaming platform_
+            </textarea>
+          </section>
+        </section>
+
+        <section>
+          <section id="concepts" data-markdown>
+            <script type="text/template">
+              ## Core Concepts of Kafka (Core)
+
+              * [Records](#/records)
+              * [Topics](#/topics)
+              * [Partitions](#/partitions)
+              * [Replicas and In-Sync Replicas](#/replicas)
+              * [Offsets](#/offsets)
+              * [Brokers](#/brokers)
+              * [Producers](#/producers)
+              * [Consumers](#/consumers)
+              * [Retention](#/retention)
+            </script>
+          </section>
+          <section id="records">
+            <h2>Records</h2>
+            <ol>
+              <li><b>Record</b> (aka <b>message</b> or <b>event</b>) is the unit of data in Kafka</li>
+              <li>Array of bytes (in no particular format)
+                <ul>
+                  <li><a href="http://avro.apache.org/">Apache Avro</a> as data serialization framework</li>
+                </ul>
+              </li>
+              <li>Record has a <b>key</b> and a <b>value</b>
+                <ul>
+                  <li>Both could be <b>null</b></li>
+                </ul>
+              </li>
+              <li>Records are categorized into <b>topics</b></li>
+            </ol>
+          </section>
+          <section id="topics">
+            <h2>Topics</h2>
+            <ol>
+              <li>Records are categorized into <b>topics</b>
+                <ul>
+                  <li>Think a <i>table</i> or a <i>directory</i></li>
+                </ul>
+              </li>
+              <li>Producers publish messages to topics while consumers consume them</li>
+              <li>Topics are partitioned
+                <ul>
+                  <li>Namespaces of one or many <b>partitions</b></li>
+                </ul>
+              </li>
+              <li><b>kafka-topics</b> shell script manages Kafka topics</li>
+            </ol>
+          </section>
+          <section id="partitions">
+            <h2>Partitions</h2>
+            <ol>
+              <li>Topics are partitioned into one or more <b>partitions</b></li>
+              <li>Partitions hold zero, one or many records</li>
+              <li>Ordered (by offsets) immutable sequence of records</li>
+              <li>A partition is a single ordered log</li>
+              <li>Stored durably on disk</li>
+              <li>Records are added to partitions in <b>append-only</b> fashion</li>
+              <li>Partitions are replicated among brokers as <b>replicas</b></li>
+              <li><b>In-sync replicas (ISRs)</b></li>
+            </ol>
+          </section>
+          <section id="replicas" style="font-size: 90%">
+            <h2>Replicas and In-Sync Replicas</h2>
+            <ol>
+              <li><b>Replica</b> is a copy of a partition</li>
+              <li><b>Replication factor</b> is the number of replicas of a topic
+                <ul>
+                  <li>There can be one or many replicas</li>
+                  <li>Allows for automatic failover when a broker fails</li>
+                </ul>
+              </li>
+              <li>One replica is the <b>leader</b> while others are <b>followers</b>
+                <ul>
+                  <li>Leader handles writes from producers, and the followers merely copy the leader's log</li>
+                </ul>
+              </li>
+              <li><b>In-Sync Replica</b> is a replica that has <i>enough</i> records to be considered in <b>partition leader election</b></li>
+              <li>Use <b>kafka-topics --describe</b> to list the details of a topic (incl. replicas and in-sync replicas)</li>
+            </ol>
+          </section>
+          <section id="offsets">
+            <h2>Offsets</h2>
+            <ol>
+              <li><b>Offset</b> is a unique sequential numerical position of a record (in a partition of a topic)
+                <ul>
+                  <li>A message in a partition has a unique offset</li>
+                </ul>
+              </li>
+              <li>Offsets start from 0</li>
+              <li>Offsets are unique per partition only
+                <ul>
+                  <li>Not across partitions</li>
+                </ul>
+              </li>
+            </ol>
+          </section>
+          <section>
+            <h2>Kafka Topics and Partitions</h2>
+            <h5>(distributed commit log)</h5>
+            <img width="70%" style="background:none; border:none; box-shadow:none;" data-src="images/kafka-topic-anatomy.png">
+            <br>
+            <small>From <a href="https://kafka.apache.org/documentation">Official Documentation of Apache Kafka</a></small>
+          </section>
+          <section>
+            <h2>Kafka Topics and Partitions <small>(cntd)</small></h2>
+            <img width="150%" style="background:none; border:none; box-shadow:none;" data-src="images/kafka-partitions.png">
+            <br>
+            <small>From <a href="https://www.safaribooksonline.com/library/view/kafka-the-definitive/9781491936153/">Kafka: The Definitive Guide</a></small>
+          </section>
+          <section id="brokers">
+            <h2>Brokers</h2>
+            <ol>
+              <li><b>Kafka Broker</b> is a Kafka server that manages records
+                <ul>
+                  <li>Receives messages, assigns offsets, and commits messages to storage on disk</li>
+                </ul>
+              </li>
+              <li><b>Kafka Cluster</b> consists of one or more brokers
+                <ul>
+                  <li>Uses Zookeeper as the source of truth</li>
+                </ul>
+              </li>
+            </ol>
+          </section>
+          <section id="producers">
+            <h2>Producers</h2>
+            <ol>
+              <li>Kafka clients that publish records to a Kafka cluster</li>
+              <li>Send messages to topics
+                <ul>
+                  <li>Can optionally specify partitions</li>
+                </ul>
+              </li>
+              <li><a href="https://kafka.apache.org/20/javadoc/org/apache/kafka/clients/producer/KafkaProducer.html">KafkaProducer</a> API for Java</li>
+            </ol>
+          </section>
+          <section id="consumers">
+            <h2>Consumers</h2>
+            <ol>
+              <li>Kafka clients that consumes records from a Kafka cluster</li>
+              <li>Subscribe to receive messages from topics</li>
+              <li>Read messages in the order they were produced
+                <ul>
+                  <li>Per partition only</li>
+                </ul>
+              </li>
+              <li><a href="https://kafka.apache.org/20/javadoc/org/apache/kafka/clients/consumer/KafkaConsumer.html">KafkaConsumer</a> API for Java</li>
+            </ol>
+          </section>
+          <section>
+            <h2>Kafka Producers and Consumers</h2>
+            <img style="background:none; border:none; box-shadow:none;" data-src="images/kafka-producers-topics-consumers.png">
+            <small>From <a href="https://www.infoq.com/articles/apache-kafka">Apache Kafka: Next Generation Distributed Messaging System</a></small>
+          </section>
+          <section>
+            <h2>Kafka Producers and Consumers <small>(cntd)</small></h2>
+            <img width="70%" style="background:none; border:none; box-shadow:none;" data-src="images/kafka-producers-consumers.png">
+            <small>From <a href="https://kafka.apache.org/documentation">Official Documentation of Apache Kafka</a></small>
+          </section>
+          <section id="retention">
+            <h2>Retention</h2>
+            <ol>
+              <li><b>Retention</b> of messages in topics is how long messages are stored in topics
+                <ul>
+                  <li><i>Durable message retention</i></li>
+                  <li>For some period of time, e.g. 7 days</li>
+                  <li>Until a topic reaches a certain size in bytes, e.g. 1 gigabyte</li>
+                </ul>
+              </li>
+              <li>Once these limits are reached, messages are expired and deleted</li>
+              <li>Can be selected on a per-topic basis</li>
+            </ol>
+          </section>
+        </section>
+
+        <section id="kafka-features">
+          <h2>Features of Kafka</h2>
+          <ol>
+            <li>Thousands of Producers</li>
+            <li>Thousand of Consumers</li>
+            <li>Client Independence</li>
+            <li>High Throughput</li>
+            <li>Message Persistence</li>
+            <li>Disk-based Retention</li>
+            <li>Scalability</li>
+            <li>High Performance</li>
+          </ol>
+        </section>
+
+        <section id="kafka-streams" data-markdown>
+          <textarea data-template>
+            ## Kafka Streams
+
+            1. **Kafka Streams** is a client library for stream processing on Kafka
+            1. Input and output data in Kafka topics
+            1. Elastic, highly scalable, fault-tolerant
+            1. [Home Page](https://kafka.apache.org/documentation/streams/)
+          </textarea>
+        </section>
+
+        <section id="kafka-connect" data-markdown>
+          <textarea data-template>
+            ## Kafka Connect
+
+            1. **Kafka Connect** is a framework for a scalable and reliable data streaming between Apache Kafka and other systems
+            1. A framework for Kafka connectors
+            1. Distributed and standalone (single process) modes
+            1. REST interface for connector deployment and management
+            1. [Home Page](https://kafka.apache.org/documentation/#connect)
+          </textarea>
+        </section>
+
+        <section id="confluent-ksql" data-markdown style="font-size: 90%;">
+          <textarea data-template>
+            ## Confluent KSQL
+
+            1. **Confluent KSQL** is an open source streaming SQL engine for stream processing on Kafka
+            1. Interactive SQL interface
+            1. "KSQL: Query Your Streams Without Writing Code"
+            1. No need to write code in a programming language like Java or Python
+            1. Uses Kafka Streams
+              * Executing SQL on tables and streams
+            1. [Home Page](https://www.confluent.io/product/ksql/)
+          </textarea>
+        </section>
+
+        <section id="recap" data-markdown>
+          <textarea data-template>
+            ## Recap
+
+            1. [Introduction](#/intro)
+            1. [Core Concepts of Apache Kafka™](#/concepts)
+            1. [Features of Kafka](#/kafka-features)
+            1. [Kafka Streams](#/kafka-streams)
+            1. [Kafka Connect](#/kafka-connect)
+            1. [Confluent KSQL](#/confluent-ksql)
+          </textarea>
+        </section>
+
+        <section style="text-align: left" data-markdown id="questions">
+          <textarea data-template>
+            # Questions?
+
+            * Read [The Internals of Apache Kafka](https://bit.ly/apache-kafka-internals)
+            * Read [The Internals of Kafka Streams](https://bit.ly/kafka-streams-internals)
+          </textarea>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="reveal.js/lib/js/head.min.js"></script>
+    <script src="reveal.js/js/reveal.js"></script>
+
+    <script>
+      // More info about config & dependencies:
+      // - https://github.com/hakimel/reveal.js#configuration
+      // - https://github.com/hakimel/reveal.js#dependencies
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        slideNumber: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        menu: {
+          markers: true,
+          openSlideNumber: true
+        },
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function () { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/markdown/marked.js' },
+          { src: 'reveal.js/plugin/markdown/markdown.js' },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true },
+          { src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+          (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+          m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+      })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+      ga('create', 'UA-45999426-3', 'auto');
+      ga('send', 'pageview');
+
+    </script>
+  </body>
+</html>
