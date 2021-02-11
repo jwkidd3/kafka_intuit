@@ -9,7 +9,7 @@ Duration: **30 mins**
 ## Procedure
 
 1. Install the latest version of **Java 11**
-  * [OpenJDK 11.0.2 (build 11.0.2+9)](https://jdk.java.net/archive/)
+  * [openjdk-8-jdk](https://jdk.java.net/archive/)
 1. Download the latest version of **Apache Kafka**
   * [Download](http://kafka.apache.org/downloads) page
   * Use the binary download for **Scala 2.12**
