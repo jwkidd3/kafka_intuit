@@ -7,7 +7,7 @@ Duration: **30 mins**
 ## Procedure
 
 1. Configure a 3-broker Kafka cluster
-  * Use custom **broker.id** to make sure the ids are yours in kafka-topics later
+  * Use custom **broker.id** 
 1. Review the available options of **kafka-topics** shell script
   * Use **--help** option to print usage information
 1. Create a topic **t1** with 3 partitions and replication factor of 2
